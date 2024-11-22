@@ -1,4 +1,7 @@
+PySimpleGUI_License = 'owggSIrkq5rhPbeWKVHMmYJX6NM0VIZjGovgOIninI7suIcCNJUDPb72S1lwwYyWV5F57IGjNoLgDIVl6BJ57UX2glbtsckG5xClaUx2M9JmGdnCPIDs0ImCOJ5DqdwX9NO09b32610lxctkflJ'
+
 import PySimpleGUI as sg
+
 
 # Crear el layout de la ventana
 layout = [
@@ -23,7 +26,7 @@ layout = [
         ])],
         [sg.Tab('Analisis', [
             # Campos para ingresar los datos del analisis
-            
+
         ])],
         [sg.Tab('Graficos', [
             # Campos para ingresar los datos de los graficos
