@@ -21,6 +21,14 @@ layout = [
             [sg.Table(headings=['Evento', 'Nombre', 'Tipo Documento', 'Número Documento', 'Teléfono', 'Dirección', 'Tipo Participante ', 'Foto'], values=[], size=(80, 10), key='-TABLE_PARTICIPANTES-', enable_events=True)],
             [sg.Image(key='-IMAGE_PARTICIPANTE-', size=(200, 200))]
         ])],
+        [sg.Tab('Analisis', [
+            # Campos para ingresar los datos del analisis
+            
+        ])],
+        [sg.Tab('Graficos', [
+            # Campos para ingresar los datos de los graficos
+
+        ])],
             [sg.Tab('Configuración', [
             [sg.Text('Validar el aforo de los participantes'), sg.Checkbox('', key='-AFORO-')],
             [sg.Text('Solicitar imágenes'), sg.Checkbox('', key='-SOLICITAR-')],
