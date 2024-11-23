@@ -1,9 +1,33 @@
-PySimpleGUI_License = 'owggSIrkq5rhPbeWKVHMmYJX6NM0VIZjGovgOIninI7suIcCNJUDPb72S1lwwYyWV5F57IGjNoLgDIVl6BJ57UX2glbtsckG5xClaUx2M9JmGdnCPIDs0ImCOJ5DqdwX9NO09b32610lxctkflJ'
-
 import PySimpleGUI as sg
+import json
+import os
 
 
 # Crear el layout de la ventana
+
+
+def ventana_login():
+    layout = [
+        [sg.Text('Usuario'), sg.InputText(key='-USUARIO-')],
+        [sg.Text('Contraseña'), sg.InputText(key='-PASSWORD-', password_char='*')],
+        [sg.Button('Iniciar Sesión'), sg.Button('Agregar Usuario'), sg.Button('Salir')]
+    ]
+    return sg.Window('Login', layout, finalize=True)
+
+def leer_usuarios():
+    if os.path.exists("usuarios.txt"):
+        with open("usuarios.txt", "r") as f:
+            usuarios = [line.strip().split(",") for line in f.readlines()]
+            usuarios_dict = {user[0].strip(): user[1].strip() for user in usuarios if len(user) == 2}
+            return usuarios_dict
+    return {}
+
+
+def agregar_usuario(usuario, password):
+    with open("usuarios.txt", "a") as f:
+        f.write(f"{usuario},{password}\n")
+
+
 layout = [
     [sg.TabGroup([
         [sg.Tab('Eventos', [
@@ -43,7 +67,9 @@ layout = [
 ]
 
 # Crear la ventana
-window = sg.Window('-- Pagina de registro para la COP16', layout)
+
+
+window = sg.Window('Actividad 8 ≧◠‿◠≦✌', layout)
 
 # Lista para almacenar los eventos
 eventos = []
@@ -67,6 +93,19 @@ while True:
 
     if event == sg.WIN_CLOSED or event == 'Salir':
         break
+
+    if event == 'Iniciar Sesión':
+        usuario = values['-USUARIO-'].strip()
+        password = values['-PASSWORD-'].strip()
+        if usuario in usuarios and usuarios[usuario] == password:
+            sg.popup('Login exitoso')
+            ventana_login.close()
+            window_principal = ventana_principal(configuracion, eventos)
+        else:
+            sg.popup_error('Usuario o contraseña incorrectos')
+
+    if event == 'Agregar Usuario':
+        window_agregar_usuario = ventana_agregar_usuario()
 
     # Buscar imagen
     if event == 'Buscar':
