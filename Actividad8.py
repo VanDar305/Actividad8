@@ -59,9 +59,10 @@ layout = [
             [sg.Tab('Configuración', [
             [sg.Text('Validar el aforo de los participantes'), sg.Checkbox('', key='-AFORO-')],
             [sg.Text('Solicitar imágenes'), sg.Checkbox('', key='-SOLICITAR-')],
-            [sg.Text('Modificar registros'), sg.Checkbox('', key='-MOD_REG-')],
-            [sg.Text('Eliminar registros'), sg.Checkbox('', key='-ELIM_REG-')],
+            [sg.Checkbox('Modificar registros', key='-MOD_REG-', default=configuracion.get('modificar_registros', True), enable_events=True)],
+            [sg.Checkbox('Eliminar Registros', key='-ELIM_REG-', default=configuracion.get('eliminar_registros', True), enable_events=True)],
             [sg.Button('Guardar')]
+
             ])]
     ])]
 ]
@@ -87,6 +88,13 @@ def actualizar_tabla_participantes():
     values = [[participante[0], participante[1], participante[2], participante[3], participante[4], participante[5], participante[6]] for participante in participantes]
     window['-TABLE_PARTICIPANTES-'].update(values)
 
+def manejar_visibilidad_boton(window, values):
+    window['-MODIFIC_EVENTO-'].update(visible=values['-MOD_REG-'])
+    window['-ELIMINAR_EVENTO-'].update(visible=values['-ELIM_REGISTROS-'])
+    window['-MODIFICAR_PARTICIPANTE-'].update(visible=values['-MOD_REG-'])
+    window['-ELIMINAR_PARTICIPANTE-'].update(visible=values['-ELIM_REG-'])
+
+
 # Bucle principal del programa
 while True:
     event, values = window.read()
@@ -106,6 +114,9 @@ while True:
 
     if event == 'Agregar Usuario':
         window_agregar_usuario = ventana_agregar_usuario()
+
+    if event in ['-VALIDAR_AFORO-', '-SOLICITAR_IMAGENES-', '-MOD_REG-', '-ELIM_REG-']:
+            manejar_visibilidad_boton(window_principal, values)
 
     # Buscar imagen
     if event == 'Buscar':
@@ -205,5 +216,8 @@ while True:
             modificar = values['-MOD_REG-']
             eliminar = values['-ELIM_REG-']
             sg.popup(f'Se guardaron los {"cambios" if aforo or solicitar or modificar or eliminar else "cambios"}')
+
+
+    # Función para manejar la visibilidad de los botones
 
 window.close()
