@@ -5,15 +5,6 @@ import os
 
 # Crear el layout de la ventana
 
-
-def ventana_login():
-    layout = [
-        [sg.Text('Usuario'), sg.InputText(key='-USUARIO-')],
-        [sg.Text('Contraseña'), sg.InputText(key='-PASSWORD-', password_char='*')],
-        [sg.Button('Iniciar Sesión'), sg.Button('Agregar Usuario'), sg.Button('Salir')]
-    ]
-    return sg.Window('Login', layout, finalize=True)
-
 def leer_usuarios():
     if os.path.exists("usuarios.txt"):
         with open("usuarios.txt", "r") as f:
@@ -22,11 +13,25 @@ def leer_usuarios():
             return usuarios_dict
     return {}
 
+# Diálogo de inicio de sesión
+def login():
+    layout = [
+        [sg.Text('Usuario'), sg.InputText(key='-USUARIO-')],
+        [sg.Text('Contraseña'), sg.InputText(key='-CONTRASENA-', password_char='*')],
+        [sg.Button('Iniciar Sesión'), sg.Button('Cancelar')]
+    ]
+    window = sg.Window('Inicio de Sesión', layout)
+    event, values = window.read()
+    window.close()
+    return values['-USUARIO-'], values['-CONTRASENA-']
+
 
 def agregar_usuario(usuario, password):
     with open("usuarios.txt", "a") as f:
         f.write(f"{usuario},{password}\n")
 
+with open("configuracion.json", "r") as f:
+    configuracion = json.load(f)
 
 layout = [
     [sg.TabGroup([
@@ -56,14 +61,13 @@ layout = [
             # Campos para ingresar los datos de los graficos
 
         ])],
-            [sg.Tab('Configuración', [
-            [sg.Text('Validar el aforo de los participantes'), sg.Checkbox('', key='-AFORO-')],
-            [sg.Text('Solicitar imágenes'), sg.Checkbox('', key='-SOLICITAR-')],
-            [sg.Checkbox('Modificar registros', key='-MOD_REG-', default=configuracion.get('modificar_registros', True), enable_events=True)],
-            [sg.Checkbox('Eliminar Registros', key='-ELIM_REG-', default=configuracion.get('eliminar_registros', True), enable_events=True)],
-            [sg.Button('Guardar')]
-
-            ])]
+    [sg.Tab('Configuración', [
+        [sg.Text('Validar el aforo de los participantes'), sg.Checkbox('', key='-AFORO-', default=configuracion.get('aforo', False))],
+        [sg.Text('Solicitar imágenes'), sg.Checkbox('', key='-SOLICITAR-', default=configuracion.get('solicitar_imagenes', False))],
+        [sg.Checkbox('Modificar registros', key='-MOD_REG-', default=configuracion.get('modificar_registros', True), enable_events=True)],
+        [sg.Checkbox('Eliminar Registros', key='-ELIM_REG-', default=configuracion.get('eliminar_registros', True), enable_events=True)],
+        [sg.Button('Guardar')]
+    ])]
     ])]
 ]
 
@@ -88,6 +92,20 @@ def actualizar_tabla_participantes():
     values = [[participante[0], participante[1], participante[2], participante[3], participante[4], participante[5], participante[6]] for participante in participantes]
     window['-TABLE_PARTICIPANTES-'].update(values)
 
+# Obtener los usuarios del archivo
+usuarios = leer_usuarios()
+
+# Diálogo de inicio de sesión
+usuario, contrasena = login()
+
+# Validar el usuario
+if usuario in usuarios and usuarios[usuario] == contrasena:
+    # Si el usuario es válido, mostrar la ventana principal
+    window = sg.Window('Actividad 8 ≧◠‿◠≦✌', layout)
+    # ... (resto del código)
+else:
+    sg.popup_error('Usuario o contraseña incorrectos')
+
 def manejar_visibilidad_boton(window, values):
     window['-MODIFIC_EVENTO-'].update(visible=values['-MOD_REG-'])
     window['-ELIMINAR_EVENTO-'].update(visible=values['-ELIM_REGISTROS-'])
@@ -107,7 +125,7 @@ while True:
         password = values['-PASSWORD-'].strip()
         if usuario in usuarios and usuarios[usuario] == password:
             sg.popup('Login exitoso')
-            ventana_login.close()
+            login.close()
             window_principal = ventana_principal(configuracion, eventos)
         else:
             sg.popup_error('Usuario o contraseña incorrectos')
